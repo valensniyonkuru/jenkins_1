@@ -1,0 +1,25 @@
+---
+- name: Deploy Dockerized Nginx App to AWS EC2
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Pull the latest Docker image
+      community.docker.docker_image:
+        name: valensniyonkuru/my-ubuntu-website:latest
+        source: pull
+        
+    - name: Stop and remove old container if running
+      community.docker.docker_container:
+        name: my-running-app
+        state: absent
+      ignore_errors: true
+
+    - name: Run the new container
+      community.docker.docker_container:
+        name: my-running-app
+        image: valensniyonkuru/my-ubuntu-website:latest
+        state: started
+        restart_policy: always
+        ports:
+          - "80:80"
